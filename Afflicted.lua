@@ -261,6 +261,7 @@ local SpellCastSycceededSpells =
 	[GetSpellInfo(17928)] = 17928,
 	[GetSpellInfo(61384)] = 61384,
 	[GetSpellInfo(50796)] = 50796,
+	[GetSpellInfo(53007)] = 53007,
 }
 
 function Afflicted:UNIT_SPELLCAST_SUCCEEDED(event, unitToken, spellName, spellRank, ...)
