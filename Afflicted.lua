@@ -10,6 +10,8 @@ local instanceType, arenaBracket
 local summonedTotems = {}
 local summonedObjects = {}
 
+local playerGUID;
+
 function Afflicted:OnInitialize()
 	self.defaults = {
 		profile = {
@@ -265,7 +267,7 @@ function Afflicted:UNIT_SPELLCAST_SUCCEEDED(event, unitToken, spellName, spellRa
 
 
 	local spellId = SpellCastSycceededSpells[spellName];
-	if not spellId then return;end
+	if not spellId or sourceGUID == playerGUID then return;end
 
 	local spell = self:GetSpell(spellId, spellName);
 
@@ -431,6 +433,8 @@ end
 -- Enabling Afflicted based on zone type
 function Afflicted:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
+
+	playerGUID = UnitGUID("player");
 
 	if( type ~= instanceType ) then
 		-- Clear anchors because we changed zones
