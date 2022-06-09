@@ -93,6 +93,18 @@ function Afflicted:OnInitialize()
 
             local spell  = loadstring("return " .. Afflicted.db.profile.spells[index])()
             if ( type(spell) == "table" ) then
+
+                ---@class spell
+                ---@field cooldown number
+                ---@field duration number
+                ---@field name string
+                ---@field cooldownName string
+                ---@field configName string
+                ---@field disabled boolean
+                ---@field cdDisabled boolean
+                ---@field anchor boolean
+                ---@field cdAnchor number
+
                 spell.cooldown = spell.cooldown or 0
                 spell.duration = spell.duration or 0
 

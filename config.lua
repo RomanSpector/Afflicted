@@ -174,7 +174,8 @@ local function parseReset(id, ...)
     end
 end
 
--- Load all the spells into the per class list
+--Load all the spells into the per class list
+---@param spell spell
 local function buildString(spell, divider)
     local txt = ""
     if ( spell.disabled or spell.duration == 0 or not spell.anchor ) then
