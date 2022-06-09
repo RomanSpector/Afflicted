@@ -149,25 +149,29 @@ local function OnDragStop(self)
         self.isMoving = nil
         self:StopMovingOrSizing()
 
-        if ( not Afflicted.db.profile.anchors[self.type].position ) then
-            Afflicted.db.profile.anchors[self.type].position = {}
-        end
+        local scale = self:GetEffectiveScale();
+        local uiScale = UIParent:GetEffectiveScale();
 
-        local scale = self:GetEffectiveScale()
-        Afflicted.db.profile.anchors[self.type].position.x = self:GetLeft() * scale
-        Afflicted.db.profile.anchors[self.type].position.y = self:GetTop() * scale
+        local centerX = self:GetLeft() + self:GetWidth() / 2;
+        local centerY = self:GetBottom() + self:GetHeight() / 2;
+        local screenWidth, screenHeight = GetScreenWidth() * uiScale, GetScreenHeight() * uiScale;
+
+        Afflicted.db.profile.anchors[self.type].xOffset = centerX * scale - screenWidth / 2;
+        Afflicted.db.profile.anchors[self.type].yOffset = centerY * scale - screenHeight / 2;
     end
 end
 
 local function OnShow(self)
-    local position = Afflicted.db.profile.anchors[self.type].position
-    if ( position ) then
-        local scale = self:GetEffectiveScale()
-        self:ClearAllPoints()
-        self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", position.x / scale, position.y / scale)
+    local xOffset = Afflicted.db.profile.anchors[self.type].xOffset;
+    local yOffset = Afflicted.db.profile.anchors[self.type].yOffset;
+
+    if xOffset and yOffset then
+        local scale = self:GetEffectiveScale();
+        self:ClearAllPoints();
+        self:SetPoint("CENTER", UIParent, "CENTER", xOffset / scale, yOffset / scale);
     else
-        self:ClearAllPoints()
-        self:SetPoint("CENTER", UIParent, "CENTER", 0, self.createID * 25)
+        self:ClearAllPoints();
+        self:SetPoint("CENTER", UIParent,"CENTER", 0, 0);
     end
 end
 
@@ -366,25 +370,23 @@ function Icons:ReloadVisual()
     -- Update anchors and icons inside
     for name, group in pairs(Icons.groups) do
         local data = Afflicted.db.profile.anchors[name]
-
-        -- Update group scale
-        group:SetScale(data.scale)
-
-        for _, icon in pairs(group.active) do
-            icon:SetScale(data.scale)
+        if data then
+            -- Update group scale
+            group:SetScale(data.scale)
+            for _, icon in pairs(group.active) do
+                icon:SetScale(data.scale)
+            end
+            -- Annnd make sure it's shown or hidden
+            if ( Afflicted.db.profile.showAnchors ) then
+                group:SetAlpha(1)
+                group:EnableMouse(true)
+            else
+                group:SetAlpha(0)
+                group:EnableMouse(false)
+            end
+            -- Reposition
+            OnShow(group)
         end
-
-        -- Annnd make sure it's shown or hidden
-        if ( Afflicted.db.profile.showAnchors ) then
-            group:SetAlpha(1)
-            group:EnableMouse(true)
-        else
-            group:SetAlpha(0)
-            group:EnableMouse(false)
-        end
-
-        -- Reposition
-        OnShow(group)
     end
 end
 

@@ -68,7 +68,7 @@ function Afflicted:OnInitialize()
     self.defaults.profile.anchors.buffs = CopyTable(anchor)
     self.defaults.profile.anchors.buffs.text = "Buffs"
     self.defaults.profile.anchors.defenses = CopyTable(anchor)
-    self.defaults.profile.anchors.defenses.text = "Defensive"
+    self.defaults.profile.anchors.defenses.text = "Defenses"
     self.defaults.profile.anchors.damage = CopyTable(anchor)
     self.defaults.profile.anchors.damage.text = "Damage"
 

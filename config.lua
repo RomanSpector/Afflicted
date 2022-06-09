@@ -82,7 +82,16 @@ function Config:GetAnchors()
 end
 
 -- Database things
-local globalOptions = {["displayType"] = "", ["scale"] = 1, ["maxRows"] = 10, ["growUp"] = false}
+local globalOptions =
+{
+    ["displayType"] = "",
+    ["scale"] = 1,
+    ["maxRows"] = 10,
+    ["growUp"] = false,
+    ["xOffset"] = 0,
+    ["yOffset"] = 0
+}
+
 local function getGlobalOption(info)
     return globalOptions[info[#(info)]]
 end
@@ -100,6 +109,27 @@ local function setGlobalOption(info, value)
 
     Afflicted.modules.Bars:ReloadVisual()
     Afflicted.modules.Icons:ReloadVisual()
+end
+
+local function getLocalOption(info)
+    local settingName = info[4];
+    local anchorID = tostring(info[2]);
+    local anchorName = info.options.args.anchors.args[anchorID].name;
+    local cfg = Afflicted.db.profile.anchors[string.lower(anchorName)];
+
+    return cfg and cfg[settingName] or globalOptions[settingName];
+end
+
+local function setLocalOption(info, value)
+    local settingName = info[4];
+    local anchorID = tostring(info[2]);
+    local anchorName = string.lower(info.options.args.anchors.args[anchorID].name);
+
+    Afflicted.db.profile.anchors[anchorName] = Afflicted.db.profile.anchors[anchorName] or {};
+    Afflicted.db.profile.anchors[anchorName][settingName] = value;
+
+    Afflicted.modules.Bars:ReloadVisual();
+    Afflicted.modules.Icons:ReloadVisual();
 end
 
 local setSpell, getSpell
@@ -529,12 +559,16 @@ local function createAnchorConfiguration(index, anchor)
                         type = "toggle",
                         name = L["Grow up"],
                         desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                     display = {
                         order = 2,
                         type = "select",
                         name = L["Display type"],
                         values = {["bars"] = L["Bars"], ["icons"] = L["Icons"]},
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                     icon = {
                         order = 3,
@@ -542,11 +576,15 @@ local function createAnchorConfiguration(index, anchor)
                         name = L["Icon position"],
                         values = {["LEFT"] = L["Left"], ["RIGHT"] = L["Right"]},
                         hidden = isBarOptionsHidden,
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                     sep = {
                         order = 3.5,
                         name = "",
                         type = "description",
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                     fadeTime = {
                         order = 4,
@@ -555,28 +593,16 @@ local function createAnchorConfiguration(index, anchor)
                         desc = L["How many seconds it should take after a bar is finished for it to fade out."],
                         min = 0, max = 2, step = 0.1,
                         hidden = isBarOptionsHidden,
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                     scale = {
                         order = 6,
                         type = "range",
                         name = L["Scale"],
                         min = 0.01, max = 2, step = 0.01,
-                    },
-                    xOff = {
-                        order = 7,
-                        type = "range",
-                        name = "xOff",
-                        min = -1940, max = 1940, step = 0.01,
-                        get = function(info) return 0 end,
-                        set = function(info, value) for k, v in pairs(info) do print(k, v, value) end end,
-                    },
-                    yOff = {
-                        order = 7.5,
-                        type = "range",
-                        name = "yOff",
-                        min = -1080, max = 1080, step = 0.01,
-                        get = function(info) return 0 end,
-                        set = function(info, value) for k, v in pairs(info) do print(k, v, value) end end,
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                     maxRows = {
                         order = 8,
@@ -584,6 +610,24 @@ local function createAnchorConfiguration(index, anchor)
                         name = L["Max timers"],
                         desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
                         min = 1, max = 50, step = 1,
+                        set = setLocalOption,
+                        get = getLocalOption,
+                    },
+                    xOffset = {
+                        order = 7,
+                        type = "range",
+                        name = "xOffset",
+                        min = -1940, max = 1940, step = 0.01,
+                        set = setLocalOption,
+                        get = getLocalOption,
+                    },
+                    yOffset = {
+                        order = 7.5,
+                        type = "range",
+                        name = "yOffset",
+                        min = -1080, max = 1080, step = 0.01,
+                        set = setLocalOption,
+                        get = getLocalOption,
                     },
                 },
             },
@@ -873,6 +917,8 @@ local function loadOptions()
                                 order = 3,
                                 name = "",
                                 type = "description",
+                                get = getGlobalOption,
+                                set = setGlobalOption,
                             },
                             display = {
                                 order = 3,
@@ -896,6 +942,14 @@ local function loadOptions()
                                 name = L["Max timers"],
                                 desc = L["Maximum amount of timers that should be ran per an anchor at the same time, if too many are running at the same time then the new ones will simply be hidden until older ones are removed."],
                                 min = 1, max = 50, step = 1,
+                                get = getGlobalOption,
+                                set = setGlobalOption,
+                            },
+                            yOffset = {
+                                order = 7.5,
+                                type = "range",
+                                name = "yOffset",
+                                min = -1080, max = 1080, step = 0.01,
                                 get = getGlobalOption,
                                 set = setGlobalOption,
                             },
@@ -994,7 +1048,7 @@ local function loadOptions()
                         get = function() return "" end,
                         set = function(info, value)
                             addedAnchorIndex = addedAnchorIndex + 1
-                            local anchorID = string.gsub(string.lower(value), " ", "") .. addedAnchorIndex
+                            local anchorID = string.gsub(string.lower(value), " ", "")
                             anchorIDToNames[tostring(addedAnchorIndex)] = anchorID
 
                             Afflicted.db.profile.anchors[anchorID] = CopyTable(Afflicted.defaults.profile.anchorDefault)
@@ -1343,6 +1397,9 @@ local function loadOptions()
     ---@diagnostic disable-next-line: undefined-field
     options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(Afflicted.db)
     options.args.profile.order = 5
+
+
+    Afflicted.Options = options;
 end
 
 
