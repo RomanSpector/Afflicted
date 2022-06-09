@@ -7,10 +7,10 @@ do
 	-- Tooltip scanning every single spell while it's loading would be not be that fun. Scanning spells as we search them (and get valid results)
 	-- is a better solution since the results can be cached too.
 	local function spellFilter(self, spellID)
-		if( filterCache[spellID] ~= nil ) then return filterCache[spellID] end
+		if ( filterCache[spellID] ~= nil ) then return filterCache[spellID] end
 		
 		-- Very very few auras are over 100 yard range, and those are generally boss spells should be able to get away with this
-		if( select(9, GetSpellInfo(spellID)) > 100 ) then
+		if ( select(9, GetSpellInfo(spellID)) > 100 ) then
 			filterCache[spellID] = true
 			return false
 		end
@@ -20,14 +20,14 @@ do
 		self.tooltip:SetHyperlink("spell:" .. spellID)
 		for i=1, self.tooltip:NumLines() do
 			local text = self.tooltip["TextLeft" .. i]
-			if( text ) then
+			if ( text ) then
 				local r, g, b = text:GetTextColor()
 				r = math.floor(r + 0.10)
 				g = math.floor(g + 0.10)
 				b = math.floor(b + 0.10)
 				
 				-- Gold first text, it's a profession link
-				if( i == 1 and ( r ~= 1 or g ~= 1 or g ~= 1 ) ) then
+				if ( i == 1 and ( r ~= 1 or g ~= 1 or g ~= 1 ) ) then
 					filterCache[spellID] = false
 					return false
 				-- Gold for anything else and it should be a valid aura

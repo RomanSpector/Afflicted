@@ -18,7 +18,7 @@ do
 				self.tooltip:SetSpell(i + offset, tab)
 				
 				local spellName, _, spellID = self.tooltip:GetSpell()
-				if( spellName ) then
+				if ( spellName ) then
 					playerSpells[spellID] = true
 				end
 			end
@@ -30,7 +30,7 @@ do
 		local self = AceGUI:Create("Predictor_Base")
 		self.spellFilter = spellFilter
 
-		if( not frame ) then
+		if ( not frame ) then
 			frame = CreateFrame("Frame")
 			frame:RegisterEvent("SPELLS_CHANGED")
 			frame:SetScript("OnEvent", loadPlayerSpells)

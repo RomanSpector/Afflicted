@@ -15,7 +15,7 @@ do
 	-- Given users have to actually move the mouse, type what they want etc
 	-- it should result in them not noticing it does not have all the spell data yet
 	local function startLoading()
-		if( spellLoader ) then return end
+		if ( spellLoader ) then return end
 
 		spellLoader = CreateFrame("Frame")
 		spellLoader.timeElapsed = 0
@@ -23,11 +23,11 @@ do
 		spellLoader.index = 0
 		spellLoader:SetScript("OnUpdate", function(self, elapsed)
 			self.timeElapsed = self.timeElapsed + elapsed
-			if( self.timeElapsed < 0.10 ) then return end
+			if ( self.timeElapsed < 0.10 ) then return end
 			self.timeElapsed = self.timeElapsed - 0.10
 
 			-- Too many invalid spells found will assume we found all there is that we can
-			if( self.totalInvalid >= 5000 ) then
+			if ( self.totalInvalid >= 5000 ) then
 				self:Hide()
 				return
 			end
@@ -40,10 +40,10 @@ do
 				-- The majority of spells that use the engineer gear icon are actually invalid spells that we can easily ignore
 				-- since there are ~12000 not counting duplicate names that use this icon it's worthwhile to filter out these spells
 				self.totalInvalid = self.totalInvalid + 1
-				if( name and icon ~= "Interface\\Icons\\Trade_Engineering" ) then
+				if ( name and icon ~= "Interface\\Icons\\Trade_Engineering" ) then
 					name = string.lower(name)
 					
-					if( not spells[name] ) then
+					if ( not spells[name] ) then
 						spells[string.lower(name)] = i
 						table.insert(indexedSpells, name)
 						
@@ -54,7 +54,7 @@ do
 			end
 			
 			-- Every ~1 second it will update any visible predicters to make up for the fact that the data is delay loaded
-			if( spellLoader.index % 5000 == 0 ) then
+			if ( spellLoader.index % 5000 == 0 ) then
 				for predicter in pairs(visiblePredicters) do
 					searchSpells(predicter, predicter.lastQuery)
 				end
@@ -72,7 +72,7 @@ do
 		local usedButtons = 0
 		for i=1, totalSpellsLoaded do
 			local name = indexedSpells[i]
-			if( string.match(name, query) ) then
+			if ( string.match(name, query) ) then
 				usedButtons = usedButtons + 1
 
 				local spellName, _, spellIcon = GetSpellInfo(spells[name])
@@ -81,20 +81,20 @@ do
 				button:SetFormattedText("|T%s:20:20:2:11|t %s", spellIcon, spellName)
 				button:Show()
 				
-				if( usedButtons ~= self.selectedButton ) then
+				if ( usedButtons ~= self.selectedButton ) then
 					button:UnlockHighlight()
 
-					if( GameTooltip:IsOwned(button) ) then
+					if ( GameTooltip:IsOwned(button) ) then
 						GameTooltip:Hide()
 					end
 				end
 				
 				-- Ran out of text to suggest :<
-				if( usedButtons >= PREDICTION_ROWS ) then break end
+				if ( usedButtons >= PREDICTION_ROWS ) then break end
 			end
 		end
 		
-		if( usedButtons > 0 ) then
+		if ( usedButtons > 0 ) then
 			self:SetHeight(15 + usedButtons * 17)
 			self:Show()
 		else
@@ -134,14 +134,14 @@ do
 	end
 		
 	local function ShowButton(self)
-		if( self.lasttext ~= "" ) then
+		if ( self.lasttext ~= "" ) then
 			self.editbox.predictFrame.selectedButton = nil
 			searchSpells(self.editbox.predictFrame, "^" .. string.lower(self.lasttext))
 		else
 			self.editbox.predictFrame:Hide()
 		end
 			
-		if( self.showbutton ) then
+		if ( self.showbutton ) then
 			self.button:Show()
 			self.editbox:SetTextInsets(0,20,3,3)
 		end
@@ -154,7 +154,7 @@ do
 	end
 	
 	local function EditBox_OnEnterPressed(this)
-		if( this.predictFrame.selectedButton ) then
+		if ( this.predictFrame.selectedButton ) then
 			this.predictFrame.buttons[this.predictFrame.selectedButton]:Click()
 			this.predictFrame.selectedButton = nil
 			return
@@ -163,7 +163,7 @@ do
 		local self = this.obj
 		local value = this:GetText()
 		local cancel = self:Fire("OnEnterPressed", value)
-		if( not cancel ) then
+		if ( not cancel ) then
 			HideButton(self)
 		end
 
@@ -209,7 +209,7 @@ do
 	local function EditBox_OnReceiveDrag(this)
 		local self = this.obj
 		local type, id, info = GetCursorInfo()
-		if( type == "spell" ) then
+		if ( type == "spell" ) then
 			local name = GetSpellName(id, info)
 			self:SetText(name)
 			self:Fire("OnEnterPressed" ,name)
@@ -222,7 +222,7 @@ do
 	local function EditBox_OnTextChanged(this)
 		local self = this.obj
 		local value = this:GetText()
-		if( value ~= self.lasttext ) then
+		if ( value ~= self.lasttext ) then
 			self:Fire("OnTextChanged", value)
 			self.lasttext = value
 			ShowButton(self)
@@ -234,14 +234,14 @@ do
 	end
 	
 	local function EditBox_OnEditFocusGained(self)
-		if( self.predictFrame:IsVisible() ) then
+		if ( self.predictFrame:IsVisible() ) then
 			Predicter_OnShow(self.predictFrame)
 		end
 	end
 	
 	local function SetDisabled(self, disabled)
 		self.disabled = disabled
-		if( disabled ) then
+		if ( disabled ) then
 			self.editbox:EnableMouse(false)
 			self.editbox:ClearFocus()
 			self.editbox:SetTextColor(0.5, 0.5, 0.5)
@@ -262,7 +262,7 @@ do
 	end
 	
 	local function SetLabel(self, text)
-		if( text and text ~= "" ) then
+		if ( text and text ~= "" ) then
 			self.label:SetText(text)
 			self.label:Show()
 			self.editbox:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 7, -18)
@@ -278,13 +278,13 @@ do
 	end
 	
 	local function Predicter_OnMouseDown(self, direction)
-		if( direction == "LEFT" or direction == "RIGHT" ) then
+		if ( direction == "LEFT" or direction == "RIGHT" ) then
 			EditBox_FixCursorPosition(self.editbox, direction)
 			return
 		end
 		
 		self.selectedButton = (self.selectedButton or 0) + direction
-		if( self.selectedButton > self.usedButtons ) then
+		if ( self.selectedButton > self.usedButtons ) then
 			self.selectedButton = 1
 		elseif( self.selectedButton <= 0 ) then
 			self.selectedButton = self.usedButtons
@@ -292,7 +292,7 @@ do
 		
 		for i=1, self.usedButtons do
 			local button = self.buttons[i]
-			if( i == self.selectedButton ) then
+			if ( i == self.selectedButton ) then
 				button:LockHighlight()
 				
 				GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT")
@@ -300,7 +300,7 @@ do
 			else
 				button:UnlockHighlight()
 				
-				if( GameTooltip:IsOwned(button) ) then
+				if ( GameTooltip:IsOwned(button) ) then
 					GameTooltip:Hide()
 				end
 			end
@@ -364,7 +364,7 @@ do
 			button.editbox = editbox
 			button:Hide()
 			
-			if( i > 1 ) then
+			if ( i > 1 ) then
 				button:SetPoint("TOPLEFT", predictFrame.buttons[i - 1], "BOTTOMLEFT", 0, 0)
 				button:SetPoint("TOPRIGHT", predictFrame.buttons[i - 1], "BOTTOMRIGHT", 0, 0)
 			else

@@ -5,7 +5,7 @@ do
 	local filterCache = {}
 	
 	local function spellFilter(self, spellID)
-		if( filterCache[spellID] ~= nil ) then return filterCache[spellID] end
+		if ( filterCache[spellID] ~= nil ) then return filterCache[spellID] end
 		
 		-- Scan first line to figure out if it's a profession
 		self.tooltip:SetHyperlink("spell:" .. spellID)
@@ -14,7 +14,7 @@ do
 		g = math.floor(g + 0.10)
 		b = math.floor(b + 0.10)
 		
-		if( r ~= 1 or g ~= 1 or b ~= 1 ) then
+		if ( r ~= 1 or g ~= 1 or b ~= 1 ) then
 			filterCache[spellID] = false
 			return false
 		end

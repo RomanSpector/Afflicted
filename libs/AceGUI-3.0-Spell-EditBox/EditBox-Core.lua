@@ -52,18 +52,18 @@ do
 		
 		local activeButtons = 0
 		for spellID, name in pairs(SpellData.spellList) do
-			if( not alreadyAdded[name] and string.match(name, query) and ( not self.obj.spellFilter or self.obj.spellFilter(self.obj, spellID) ) ) then
+			if ( not alreadyAdded[name] and string.match(name, query) and ( not self.obj.spellFilter or self.obj.spellFilter(self.obj, spellID) ) ) then
 				activeButtons = activeButtons + 1
 
 				local button = self.buttons[activeButtons]
 				local spellName, spellRank, spellIcon = GetSpellInfo(spellID)
-				if( self.obj.useRanks and spellRank and spellRank ~= "" ) then
+				if ( self.obj.useRanks and spellRank and spellRank ~= "" ) then
 					button:SetFormattedText("|T%s:20:20:2:11|t %s (%s)", spellIcon, spellName, spellRank)
 				else
 					button:SetFormattedText("|T%s:20:20:2:11|t %s", spellIcon, spellName)
 				end
 				
-				if( not self.obj.useRanks ) then
+				if ( not self.obj.useRanks ) then
 					alreadyAdded[name] = true
 				end
 				
@@ -71,20 +71,20 @@ do
 				button:Show()
 				
 				-- Highlight if needed
-				if( activeButtons ~= self.selectedButton ) then
+				if ( activeButtons ~= self.selectedButton ) then
 					button:UnlockHighlight()
 
-					if( GameTooltip:IsOwned(button) ) then
+					if ( GameTooltip:IsOwned(button) ) then
 						GameTooltip:Hide()
 					end
 				end
 				
 				-- Ran out of text to suggest :<
-				if( activeButtons >= PREDICTOR_ROWS ) then break end
+				if ( activeButtons >= PREDICTOR_ROWS ) then break end
 			end
 		end
 		
-		if( activeButtons > 0 ) then
+		if ( activeButtons > 0 ) then
 			self:SetHeight(15 + activeButtons * 17)
 			self:Show()
 		else
@@ -95,14 +95,14 @@ do
 	end
 				
 	local function ShowButton(self)
-		if( self.lastText ~= "" ) then
+		if ( self.lastText ~= "" ) then
 			self.predictFrame.selectedButton = nil
 			Predictor_Query(self.predictFrame)
 		else
 			self.predictFrame:Hide()
 		end
 			
-		if( self.showButton ) then
+		if ( self.showButton ) then
 			self.button:Show()
 			self.editBox:SetTextInsets(0, 20, 3, 3)
 		end
@@ -122,7 +122,7 @@ do
 		
 		-- Make sure the tooltip isn't kept open if one of the buttons was using it
 		for _, button in pairs(self.buttons) do
-			if( GameTooltip:IsOwned(button) ) then
+			if ( GameTooltip:IsOwned(button) ) then
 				GameTooltip:Hide()
 			end
 		end
@@ -147,13 +147,13 @@ do
 		local self = this.obj
 
 		-- Something is selected in the predictor, use that value instead of whatever is in the input box
-		if( self.predictFrame.selectedButton ) then
+		if ( self.predictFrame.selectedButton ) then
 			self.predictFrame.buttons[self.predictFrame.selectedButton]:Click()
 			return
 		end
 	
 		local cancel = self:Fire("OnEnterPressed", this:GetText())
-		if( not cancel ) then
+		if ( not cancel ) then
 			HideButton(self)
 		end
 
@@ -175,9 +175,9 @@ do
 	local function EditBox_OnReceiveDrag(this)
 		local self = this.obj
 		local type, id, info = GetCursorInfo()
-		if( type == "spell" ) then
+		if ( type == "spell" ) then
 			local name, rank = GetSpellName(id, info)
-			if( self.useRanks and rank and rank ~= "" ) then
+			if ( self.useRanks and rank and rank ~= "" ) then
 				name = string.format("%s (%s)", name, rank)
 			end
 			
@@ -193,7 +193,7 @@ do
 	local function EditBox_OnTextChanged(this)
 		local self = this.obj
 		local value = this:GetText()
-		if( value ~= self.lastText ) then
+		if ( value ~= self.lastText ) then
 			self:Fire("OnTextChanged", value)
 			self.lastText = value
 			
@@ -206,7 +206,7 @@ do
 	end
 	
 	local function EditBox_OnEditFocusGained(self)
-		if( self.obj.predictFrame:IsVisible() ) then
+		if ( self.obj.predictFrame:IsVisible() ) then
 			Predictor_OnShow(self.obj.predictFrame)
 		end
 	end
@@ -222,7 +222,7 @@ do
 		
 	local function SetDisabled(self, disabled)
 		self.disabled = disabled
-		if( disabled ) then
+		if ( disabled ) then
 			self.editBox:EnableMouse(false)
 			self.editBox:ClearFocus()
 			self.editBox:SetTextColor(0.5, 0.5, 0.5)
@@ -243,7 +243,7 @@ do
 	end
 	
 	local function SetLabel(self, text)
-		if( text and text ~= "" ) then
+		if ( text and text ~= "" ) then
 			self.label:SetText(text)
 			self.label:Show()
 			self.editBox:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 7, -18)
@@ -260,13 +260,13 @@ do
 	
 	local function Predictor_OnMouseDown(self, direction)
 		-- Fix the cursor positioning if left or right arrow key was used
-		if( direction == "LEFT" or direction == "RIGHT" ) then
+		if ( direction == "LEFT" or direction == "RIGHT" ) then
 			EditBox_FixCursorPosition(self.editBox, direction)
 			return
 		end
 		
 		self.selectedButton = (self.selectedButton or 0) + direction
-		if( self.selectedButton > self.activeButtons ) then
+		if ( self.selectedButton > self.activeButtons ) then
 			self.selectedButton = 1
 		elseif( self.selectedButton <= 0 ) then
 			self.selectedButton = self.activeButtons
@@ -275,7 +275,7 @@ do
 		-- Figure out what to highlight and show the spell tooltip while we're at it
 		for i=1, self.activeButtons do
 			local button = self.buttons[i]
-			if( i == self.selectedButton ) then
+			if ( i == self.selectedButton ) then
 				button:LockHighlight()
 				
 				GameTooltip:SetOwner(button, "ANCHOR_BOTTOMRIGHT", 3)
@@ -283,7 +283,7 @@ do
 			else
 				button:UnlockHighlight()
 				
-				if( GameTooltip:IsOwned(button) ) then
+				if ( GameTooltip:IsOwned(button) ) then
 					GameTooltip:Hide()
 				end
 			end
@@ -292,7 +292,7 @@ do
 				
 	local function Spell_OnClick(self)
 		local name, rank = GetSpellInfo(self.spellID)
-		if( self.useRanks and rank and rank ~= "" ) then
+		if ( self.useRanks and rank and rank ~= "" ) then
 			name = string.format("%s (%s)", name, rank)
 		end
 		
@@ -346,7 +346,7 @@ do
 			button.editBox = editBox
 			button:Hide()
 			
-			if( i > 1 ) then
+			if ( i > 1 ) then
 				button:SetPoint("TOPLEFT", predictFrame.buttons[i - 1], "BOTTOMLEFT", 0, 0)
 				button:SetPoint("TOPRIGHT", predictFrame.buttons[i - 1], "BOTTOMRIGHT", 0, 0)
 			else
@@ -403,7 +403,7 @@ do
 		predictFrame.obj = self
 		
 		-- Purely meant for a single tooltip for doing scanning
-		if( not tooltip ) then
+		if ( not tooltip ) then
 			tooltip = CreateFrame("GameTooltip")
 			tooltip:SetOwner(UIParent, "ANCHOR_NONE")
 			for i=1, 6 do
