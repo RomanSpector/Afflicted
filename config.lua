@@ -556,7 +556,7 @@ local function createAnchorConfiguration(index, anchor)
 						order = 6,
 						type = "range",
 						name = L["Scale"],
-						min = 0.01, max = 2, step = 0.01,
+						min = 0.01, max = 4, step = 0.01,
 					},
 					xOff = {
 						order = 7,
@@ -882,7 +882,7 @@ local function loadOptions()
 								order = 5,
 								type = "range",
 								name = L["Scale"],
-								min = 0.01, max = 2, step = 0.01,
+								min = 0.01, max = 4, step = 0.01,
 								get = getGlobalOption,
 								set = setGlobalOption,
 							},
