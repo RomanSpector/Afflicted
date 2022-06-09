@@ -56,7 +56,7 @@ local function OnUpdate(self, elapsed)
 	self.timeLeft = self.timeLeft - (time - self.lastUpdate)
 	self.lastUpdate = time
 	
-	if( self.timeLeft <= 0 ) then
+	if ( self.timeLeft <= 0 ) then
 		-- Check if we should start the timer again
 		if( self.repeating ) then
 			self.timeLeft = self.startSeconds
@@ -82,25 +82,31 @@ local function OnUpdate(self, elapsed)
 		end
 		return
 	end
-	
+
 	-- Otherwise, update!
-	if( self.timeLeft > 60 ) then
-		self.text:SetFormattedText("%dm", self.timeLeft / 60)
-	elseif( self.timeLeft > 10 ) then
-		self.text:SetFormattedText("%d", self.timeLeft)
-	else
-		self.text:SetFormattedText("%.1f", self.timeLeft)
-	end
+	-- if( self.timeLeft > 60 ) then
+	-- 	self.text:SetFormattedText("%dm", self.timeLeft / 60)
+	-- elseif( self.timeLeft > 10 ) then
+	-- 	self.text:SetFormattedText("%d", self.timeLeft)
+	-- else
+	-- 	self.text:SetFormattedText("%.1f", self.timeLeft)
+	-- end
 end
 
--- Create an icon
+---@class AfflictedIcon: Frame
+---@field icon texture
+---@field text FontString
+---@field cooldown Cooldown
+
+---Create an icon
+---@return AfflictedIcon
 local function createIcon()
 	local frame = CreateFrame("Frame", nil, UIParent)
 	frame:SetWidth(30)
 	frame:SetHeight(ICON_SIZE)
 	frame:SetClampedToScreen(true)
 	frame:SetScript("OnUpdate", OnUpdate)
-	
+
 	frame.icon = frame:CreateTexture(nil, "BACKGROUND")
 	frame.icon:SetTexture([[Interface\Buttons\WHITE8X8]])
 	frame.icon:SetWidth(ICON_SIZE)
@@ -108,14 +114,20 @@ local function createIcon()
 	frame.icon:SetPoint("TOPRIGHT",frame,"TOPRIGHT",0,0)
 	frame.icon:SetPoint("BOTTOMLEFT",frame,"BOTTOMLEFT",0,0)
 	frame.icon:SetVertexColor(0.93,0.93,0.93)
-	
+
 	frame.text = frame:CreateFontString(nil, "BACKGROUND")
 	frame.text:SetFontObject(GameFontHighlight)
 	frame.text:SetPoint("CENTER", ICON_SIZE, "CENTER", 0, 0)
-	
+
+	frame.cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate");
+	frame.cooldown:SetAllPoints();
+	frame.cooldown:SetDrawEdge(true);
+	frame.cooldown:SetReverse(false);
+
 	return frame
 end
 
+---@return AfflictedIcon
 local function getIcon(group, id)
 	for i, frame in ipairs(group.active) do
 		if frame.id == id then
@@ -312,7 +324,9 @@ function Icons:CreateTimer(sourceGUID, sourceName, anchor, repeating, isCooldown
 	frame.type = group.type
 	frame.icon:SetTexture(spellIcon)
 	frame:SetScale(Afflicted.db.profile.anchors[anchor].scale)
-	
+
+	frame.cooldown:SetCooldown(GetTime(), duration);
+
 	-- Reposition
 	repositionTimers(group)
 end
