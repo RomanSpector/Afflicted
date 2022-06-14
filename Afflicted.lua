@@ -286,9 +286,10 @@ local SpellCastSucceededList =
 function Afflicted:UNIT_SPELLCAST_SUCCEEDED(event, unitToken, spellName, spellRank, ...)
     local sourceGUID = UnitGUID(unitToken);
     local sourceName = UnitName(unitToken);
+    local reaction = UnitReaction(unitToken, "player");
 
     local spellId = SpellCastSucceededList[spellName];
-    if not spellId or sourceGUID == playerGUID then return;end
+    if not spellId or sourceGUID == playerGUID or reaction > 3 then return;end
 
     local spell = self:GetSpell(spellId, spellName);
 
